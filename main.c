@@ -220,3 +220,36 @@ void preOrder(Node *root) {
         preOrder(root->right);
     }
 }
+
+// queue implementation structs and functions
+typedef struct QueueNode{
+    Node * treeNode; // pointer to tree node
+    struct QueueNode * next; // pointer to next queue node
+} QueueNode;
+
+typedef struct Queue{
+    QueueNode * front; // pointer to front of queue
+    QueueNode * rear; // pointer to rear(end) of queue
+} Queue; 
+
+// function which enqueues a tree node pointer to the queue
+void enqueue(Queue * q, Node * n){
+    QueueNode * temp = (QueueNode *) malloc(sizeof(QueueNode)); // creates a new queue node
+    temp -> treeNode = n; // sets the tree node pointer
+    temp -> next = NULL; // next pointer is null 
+    if(q -> rear == NULL){ // if queue is empty
+        q -> front = temp; // front and rear both point to new node
+        q -> rear = temp; // rear also points to new node
+    } else { // if queue is not empty
+        q -> rear -> next = temp; // point rear's next to new node
+        q -> rear = temp; // update the rear to new node
+    }
+}
+
+// function which dequeue's a tree node pointer from the queue
+Node * dequeue(Queue * q){
+    if(q -> front == NULL){ // if the queue is empty
+        return NULL;
+    } 
+    QueueNode * temp = 
+}
