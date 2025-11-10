@@ -42,6 +42,8 @@ int main(int argc, const char * argv[]) {
     printf("\n");
     
     // add a function to do a level order pretty print
+    printf("Level order print of tree 1: \n");
+    levelPrint(tree1);
     
     // Create a second tree which has some values in common
     // with the above tree, and some different values.
@@ -223,7 +225,7 @@ void preOrder(Node *root) {
 
 // queue implementation structs and functions
 typedef struct QueueNode{
-    Node * treeNode; // pointer to tree node
+    Node * node; // pointer to tree node
     struct QueueNode * next; // pointer to next queue node
 } QueueNode;
 
@@ -235,7 +237,7 @@ typedef struct Queue{
 // function which enqueues a tree node pointer to the queue
 void enqueue(Queue * q, Node * n){
     QueueNode * temp = (QueueNode *) malloc(sizeof(QueueNode)); // creates a new queue node
-    temp -> treeNode = n; // sets the tree node pointer
+    temp -> node = n; // sets the tree node pointer
     temp -> next = NULL; // next pointer is null 
     if(q -> rear == NULL){ // if queue is empty
         q -> front = temp; // front and rear both point to new node
@@ -251,5 +253,74 @@ Node * dequeue(Queue * q){
     if(q -> front == NULL){ // if the queue is empty
         return NULL;
     } 
-    QueueNode * temp = 
+    QueueNode * temp = q -> front; // stores the front node to temp
+    Node *n = temp -> node; // gets the tree node pointer
+    q -> front = q -> front -> next; // updates the front pointer
+    if (q -> front == NULL){
+        q -> rear = NULL; // if queue is empty, rear pointer is also NULL
+    }
+    free(temp); // free the allocated memory
+    return n; // return the tree node pointer
+}
+
+int isQueueEmpty(Queue *q){ // a function that checks if queue is empty by passing in a queue pointer
+    return (q -> front == NULL); // returns true if front pointer is NULL
+}
+
+// function to print the tree in level order
+void levelPrint(Node * root){
+    if (root == NULL){
+        printf("The tree is empty. \n");
+        return;
+    }
+
+    Queue q = {NULL, NULL}; // initializes an empty queue
+    enqueue(&q, root); // enqueue the root node
+    int level = 0; // initializes the level counter
+    int maxHeight = root -> height; // gets the max height of the tree from the root node
+
+    while(!isQueueEmpty(&q)){
+        int nodeCounter = 0; // counter for the number of nodes at the current level
+        QueueNode * temp = q.front; // temporary pointer to traverse the queue
+
+        // count the number of nodes at the current level
+        while(temp){
+            nodeCounter++; // increment the node counter by 1
+            temp = temp -> next; // move to the next queue node
+        }
+
+        printf("Level %d: ", level); // print the current level
+
+        // process all nodes @ current level
+        for(int i = 0; i < nodeCounter; i++){
+            Node* current = dequeue(&q); // dequeue a tree node pointer
+            if(current) {
+                printf("%d %2d ", current->height, current->key);// prints the height and key (data) of the current node
+                // enqueue left child
+                enqueue(&q, current ->left);
+                // enqueue right child
+                enqueue(&q, current -> right);
+            }
+            else{
+                printf("XX "); // XX indicates NULL node
+                enqueue(&q, NULL); // enqueue NULL for left child
+                enqueue(&q, NULL); // enqueue NULL for right child
+            }
+        }
+        printf("\n"); // new line after printing all nodes at current level
+        level++; // moves on to the next level
+
+        int allNull = 3; // this is the all of the levels in the tree
+        temp = q.front; // reset temp to the front of the queue
+        while(temp){
+            if (temp -> node != NULL){
+                allNull = 0; // if any node is not NULL, set allNull to 0
+                break;
+            }
+            temp = temp -> next; // move to the next queue node
+        }
+        if(allNull) {
+            break; // if all nodes are NULL, break out of the while loop
+        }
+    }
 }
