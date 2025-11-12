@@ -223,6 +223,8 @@ void preOrder(Node *root) {
     }
 }
 
+// exercise 1
+
 // queue implementation structs and functions
 typedef struct QueueNode{
     Node * node; // pointer to tree node
@@ -268,6 +270,8 @@ int isQueueEmpty(Queue *q){ // a function that checks if queue is empty by passi
 }
 
 // function to print the tree in level order
+// function to print the tree in level order with proper spacing
+// function to print the tree in level order with proper spacing
 void levelPrint(Node * root){
     if (root == NULL){
         printf("The tree is empty. \n");
@@ -276,7 +280,7 @@ void levelPrint(Node * root){
 
     Queue q = {NULL, NULL}; // initializes an empty queue
     enqueue(&q, root); // enqueue the root node
-    int level = 0; // initializes the level counter
+    int level = 0; // initializes the level counter (depth)
     int maxHeight = root -> height; // gets the max height of the tree from the root node
 
     while(!isQueueEmpty(&q)){
@@ -289,28 +293,56 @@ void levelPrint(Node * root){
             temp = temp -> next; // move to the next queue node
         }
 
-        printf("Level %d: ", level); // print the current level
+        // Calculate height of nodes at this level (height decreases as depth increases)
+        int currentHeight = maxHeight - level;
+        
+        // Calculate spacing units: before = (2^height - 1), after = (2^height)
+        int unitsBefore = (1 << currentHeight) - 1;  // 2^height - 1
+        int unitsAfter = (1 << currentHeight);       // 2^height
+        
+        // Each unit is 2 spaces (since values are 2 chars wide)
+        int spacesBefore = unitsBefore * 2;
+        int spacesAfter = unitsAfter * 2;
+
+        // Print depth and height columns (fixed, not part of tree spacing)
+        printf("%d %d ", level, currentHeight);
 
         // process all nodes @ current level
         for(int i = 0; i < nodeCounter; i++){
             Node* current = dequeue(&q); // dequeue a tree node pointer
+            
+            // Print spaces before the value (alignment spacing)
+            for(int s = 0; s < spacesBefore; s++){
+                printf(" ");
+            }
+            
             if(current) {
-                printf("%d %2d ", current->height, current->key);// prints the height and key (data) of the current node
-                // enqueue left child
-                enqueue(&q, current ->left);
-                // enqueue right child
-                enqueue(&q, current -> right);
+                // Print only the key value (2 chars wide)
+                printf("%2d", current->key);
+                
+                // enqueue children (both null and non-null to maintain structure)
+                enqueue(&q, current->left);
+                enqueue(&q, current->right);
             }
             else{
-                printf("XX "); // XX indicates NULL node
-                enqueue(&q, NULL); // enqueue NULL for left child
-                enqueue(&q, NULL); // enqueue NULL for right child
+                // Print XX for null nodes (also 2 chars wide)
+                printf("XX");
+                
+                // enqueue NULL for both children to maintain tree structure
+                enqueue(&q, NULL);
+                enqueue(&q, NULL);
+            }
+            
+            // Print spaces after the value (separation spacing)
+            for(int s = 0; s < spacesAfter; s++){
+                printf(" ");
             }
         }
         printf("\n"); // new line after printing all nodes at current level
         level++; // moves on to the next level
 
-        int allNull = 3; // this is the all of the levels in the tree
+        // Check if all remaining nodes in queue are NULL
+        int allNull = 1;
         temp = q.front; // reset temp to the front of the queue
         while(temp){
             if (temp -> node != NULL){
@@ -319,8 +351,10 @@ void levelPrint(Node * root){
             }
             temp = temp -> next; // move to the next queue node
         }
-        if(allNull) {
-            break; // if all nodes are NULL, break out of the while loop
+        
+        // Stop if we've printed all levels or all remaining are NULL
+        if(allNull || level > maxHeight) {
+            break; // exit the loop
         }
     }
 }
