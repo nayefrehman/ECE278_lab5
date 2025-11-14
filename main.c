@@ -41,12 +41,29 @@ int main(int argc, const char * argv[]) {
     preOrder(tree1);
     printf("\n");
     
+    printf("\n");
     // add a function to do a level order pretty print
     printf("Level order print of tree 1: \n");
     levelPrint(tree1);
     
     // Create a second tree which has some values in common
     // with the above tree, and some different values.
+    Node *tree2 = NULL;
+    printf("Inserting values in tree 2\n");
+    insert(&tree2, 5);
+    insert(&tree2, 10);
+    insert(&tree2, 15);
+    insert(&tree2, 20);
+    insert(&tree2, 23);
+    insert(&tree2, 30);
+    insert(&tree2, 33);
+    insert(&tree2, 40);
+    insert(&tree2, 45);
+    insert(&tree2, 50);
+
+    printf("PreOrder traversal of the constructed AVL tree is \n");
+    preOrder(tree2);
+
     
     
     // call a function that returns a tree that is the union
