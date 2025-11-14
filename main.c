@@ -223,6 +223,7 @@ void preOrder(Node *root) {
     }
 }
 
+// exercise 1 redo for me to better understand the tree concept 
 // exercise 1
 
 // queue implementation structs and functions
@@ -358,3 +359,5 @@ void levelPrint(Node * root){
         }
     }
 }
+
+
