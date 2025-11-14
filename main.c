@@ -21,6 +21,9 @@ typedef struct Node
 void insert(Node**r, int key);
 void preOrder(Node *root);
 void levelPrint(Node * root);
+void insertUnique(Node **r, int key);                    // NEW
+void inorderInsert(Node *sourceTree, Node **destTree);   // NEW
+Node* treeUnion(Node *tree1, Node *tree2);
 
 int main(int argc, const char * argv[]) {
     Node *tree1 = NULL;
@@ -72,6 +75,18 @@ int main(int argc, const char * argv[]) {
     // of both trees. Every value should only be in the
     // result tree once even if it occurs twice in one of the
     // source trees.
+    Node *unionTree = NULL; // a tree for which it is the union of tree1 and tree2
+
+    // Call the union function
+    printf("\nCreating union of tree1 and tree2...\n");
+    unionTree = treeUnion(tree1, tree2);
+    printf("PreOrder traversal of union tree:\n");
+    preOrder(unionTree);
+    printf("\n");
+    
+    printf("Level order print of union tree:\n");
+    levelPrint(unionTree);
+
     
     
     // call a functon that returns a tree that is the intersection
@@ -89,6 +104,7 @@ Node* newNode(int key);
 void rightRotate(Node **r);
 void leftRotate(Node **r);
 int getBalance(Node *n);
+ 
 
 // Recursive function to insert a key in the subtree rooted
 // with node and returns the new root of the subtree.
@@ -242,9 +258,112 @@ void preOrder(Node *root) {
     }
 }
 
-// exercise 1 redo for me to better understand the tree concept 
-// exercise 1
+// exericse 2: Union of tree1 and tree2.
+// return a new tree 
+// Exercise 2: Tree Union
 
+// Helper function: Insert into tree but SKIP duplicates
+// This is different from the regular insert which allows duplicates
+void insertUnique(Node **r, int key) {
+    /* 1. Perform BST insertion, but stop if key already exists */
+    if (*r == NULL) {
+        *r = newNode(key);
+        return;
+    }
+
+    // If key already exists, DO NOTHING (skip it)
+    if (key == (*r)->key) {
+        return; // Exit without inserting
+    }
+
+    // Recursively insert in left or right subtree
+    if (key < (*r)->key)
+        insertUnique(&((*r)->left), key);
+    else // key > (*r)->key
+        insertUnique(&((*r)->right), key);
+    
+    /* 2. Update height of this ancestor node */
+    (*r)->height = calcHeight(*r);
+    
+    /* 3. Get the balance factor and perform rotations if needed */
+    int balance = getBalance(*r);
+
+    // Left Left Case
+    if (balance < -1 && key < (*r)->left->key) {
+        rightRotate(r);
+        return;
+    }
+    // Right Right Case
+    if (balance > 1 && key > (*r)->right->key) {
+        leftRotate(r);
+        return;
+    }
+    // Left Right Case
+    if (balance < -1 && key > (*r)->left->key) {
+        leftRotate(&((*r)->left));
+        rightRotate(r);
+        return;
+    }
+    // Right Left Case
+    if (balance > 1 && key < (*r)->right->key) {
+        rightRotate(&((*r)->right));
+        leftRotate(r);
+        return;
+    }
+}
+
+// Helper function: Traverse a tree in-order and insert all values into another tree
+// In-order traversal visits nodes in sorted order: left -> root -> right
+void inorderInsert(Node *sourceTree, Node **destTree) {
+    if (sourceTree == NULL) {
+        return; // Base case: empty tree
+    }
+    
+    // 1. Traverse left subtree first (smallest values)
+    inorderInsert(sourceTree->left, destTree);
+    
+    // 2. Insert current node's key into destination tree
+    insertUnique(destTree, sourceTree->key);
+    
+    // 3. Traverse right subtree (largest values)
+    inorderInsert(sourceTree->right, destTree);
+}
+
+// Main Union Function: Returns a new tree containing all unique values from both trees
+Node* treeUnion(Node *tree1, Node *tree2) {
+    // Step 1: Create a new empty tree for the union
+    Node *unionTree = NULL;
+    
+    // Step 2: Traverse tree1 and insert all its values into unionTree
+    // Uses in-order traversal to visit all nodes
+    inorderInsert(tree1, &unionTree);
+    
+    // Step 3: Traverse tree2 and insert all its values into unionTree
+    // If a value already exists (from tree1), insertUnique will skip it
+    inorderInsert(tree2, &unionTree);
+    
+    // Step 4: Return the new union tree
+    // Original trees (tree1 and tree2) are unchanged!
+    return unionTree;
+}
+
+// Add this to your main() function:
+/*
+    // Call the union function
+    printf("\nCreating union of tree1 and tree2...\n");
+    Node *unionTree = treeUnion(tree1, tree2);
+    
+    printf("PreOrder traversal of union tree:\n");
+    preOrder(unionTree);
+    printf("\n");
+    
+    printf("Level order print of union tree:\n");
+    levelPrint(unionTree);
+*/
+
+
+
+// exercise 1
 // queue implementation structs and functions
 typedef struct QueueNode{
     Node * node; // pointer to tree node
